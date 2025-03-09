@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,13 +12,16 @@ using MovieForum.Models;
 
 namespace MovieForum.Controllers
 {
+    [Authorize]
     public class CommentsController : Controller
     {
         private readonly MovieForumContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CommentsController(MovieForumContext context)
+        public CommentsController(MovieForumContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // Removed actions
@@ -41,10 +46,14 @@ namespace MovieForum.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CommentId,Content,CreateDate,DiscussionId")] Comment comment)
         {
+            
+            comment.ApplicationUserId = _userManager.GetUserId(User);
+
             if (ModelState.IsValid)
             {
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction("GetDiscussion", "Home", new { id = comment.DiscussionId });
             }
 

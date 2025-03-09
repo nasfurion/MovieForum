@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieForum.Data;
@@ -9,16 +10,19 @@ namespace MovieForum.Controllers
     public class HomeController : Controller
     {
         private readonly MovieForumContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(MovieForumContext context)
+        public HomeController(MovieForumContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
         {
             var discussions = await _context.Discussion
                 .Include(d => d.Comments)
+                .Include(d => d.ApplicationUser)
                 .OrderByDescending(d => d.CreateDate)
                 .ToListAsync();
 
@@ -33,15 +37,42 @@ namespace MovieForum.Controllers
             }
 
             var discussion = await _context.Discussion
-                .Include(d => d.Comments)
+                .Include(d => d.ApplicationUser)
+                .Include(c => c.Comments)
+                    .ThenInclude(c => c.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.DiscussionId == id);
 
             if (discussion == null)
             {
                 return NotFound();
             }
-
+            
             return View(discussion);
+        }
+
+        public async Task<IActionResult> Profile(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+            
+            var discussions = await _context.Discussion
+                .Where(d => d.ApplicationUserId == id)
+                .OrderByDescending(d => d.CreateDate)
+                .Include(d=>d.Comments)
+                .ToListAsync();
+
+            ProfileViewModel profile = new ProfileViewModel
+            {
+                User = user,
+                Discussions = discussions
+            };
+
+            return View(profile);
         }
 
         public IActionResult Privacy()
@@ -54,5 +85,6 @@ namespace MovieForum.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
     }
 }

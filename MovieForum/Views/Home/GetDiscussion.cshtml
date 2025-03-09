@@ -9,13 +9,31 @@
 
     <div class="card mb-4">
         <div class="card-body">
+            
             @if (!string.IsNullOrEmpty(Model.ImageFilename))
             {
                 <div class="mb-3">
                     <img src="@Url.Content("/photos/" + Model.ImageFilename)" alt="Discussion Image" class="img-fluid rounded hover-image" style="object-fit: contain; max-height: 550px; width: 100%;" data-bs-toggle="modal" data-bs-target="#imageModal" />
                 </div>
             }
+            <div class="d-flex flex-row align-items-center">
+                @if (!string.IsNullOrEmpty(Model.ApplicationUser?.ImageFilename))
+                {
+                    <img class="thumbnail" src="~/profile_img/@Model.ApplicationUser.ImageFilename" />
+                    <div class="d-flex flex-row align-items-center">
+                        <p class="card-text m-1">
+                            <strong>Author:</strong>
+                        </p>
+                        <a asp-controller="Home" asp-action="Profile" asp-route-id="@Model.ApplicationUser?.Id" class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">@Model.ApplicationUser?.Name</a>
+                    </div>
+                }
+                else
+                {
+                    <img class="thumbnail" src="~/2337401-200.png" />
+                }
 
+            </div>
+            
             <p><strong>Created on:</strong> @Model.CreateDate.ToString("MMMM dd, yyyy")</p>
             <p>@Model.Content</p>
 
@@ -34,6 +52,12 @@
                 <li class="list-group-item">
                     <p>@comment.Content</p>
                     <small class="text-muted">Posted on @comment.CreateDate.ToString("MMMM dd, yyyy HH:mm")</small>
+                    <div class="d-flex flex-row align-items-center">
+                        <p class="card-text m-1">
+                            <strong>Author:</strong>
+                        </p>
+                        <a asp-controller="Home" asp-action="Profile" asp-route-id="@comment.ApplicationUser?.Id" class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">@comment.ApplicationUser?.Name</a>
+                    </div>
                 </li>
             }
         </ul>
@@ -73,5 +97,12 @@
         justify-content: center; 
         align-items: center; 
         min-height: 400px;
+    }
+
+    .thumbnail {
+        height: 50px;
+        width: 50px;
+        object-fit: cover;
+        border-radius: 20%
     }
 </style>

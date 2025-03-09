@@ -1,4 +1,6 @@
-﻿namespace MovieForum.Models
+﻿using MovieForum.Data;
+
+namespace MovieForum.Models
 {
     public class Comment
     {
@@ -12,6 +14,12 @@
 
         // Navigation property
         public Discussion? Discussion { get; set; }
+
+        // Foreign key (AspNetUsers table)
+        public string ApplicationUserId { get; set; } = string.Empty;
+
+        // Navigation property
+        public ApplicationUser? ApplicationUser { get; set; } // nullable!!!
 
     }
 }

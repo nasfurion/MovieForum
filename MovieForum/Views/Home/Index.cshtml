@@ -5,7 +5,7 @@
 }
 
 <div class="container mt-4">
-    <h1 class="text-center mb-4">Discussions</h1>
+    <h1 class="text-center mb-4">Threads</h1>
 
     @foreach (var item in Model)
     {
@@ -17,7 +17,7 @@
                 <div class="col-md-4" style="height: 150px">
                     @if (!string.IsNullOrEmpty(item.ImageFilename))
                     {
-                        <img class="img-fluid rounded-start" src="@imageUrl" alt="Discussion Image" style="object-fit: cover; height: 150px; width: 100%;" />
+                        <img class="img-fluid rounded-start" src="@imageUrl" alt="Discussion Image" style="object-fit: cover; height: 194px; width: 100%;" />
                     } else {
                         <img class="img-fluid rounded-start fallback" src="~/6041412.png" alt="Fallback Image"/>
                     }
@@ -33,6 +33,23 @@
                         <p class="card-text">
                             <strong>Comments:</strong> @commentsNum
                         </p>
+                        <div class="d-flex flex-row align-items-center">
+                            @if (!string.IsNullOrEmpty(item.ApplicationUser?.ImageFilename))
+                            {
+                                <img class="thumbnail" src="~/profile_img/@item.ApplicationUser?.ImageFilename" />
+                            } else
+                            {
+                                <img class="thumbnail" src="~/2337401-200.png" />
+                            }
+
+                            <div class="d-flex flex-row align-items-center">
+                                <p class="card-text m-1">
+                                    <strong>Author:</strong>
+                                </p>
+                                <a asp-controller="Home" asp-action="Profile" asp-route-id="@item.ApplicationUser?.Id" class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">@item.ApplicationUser?.Name</a>
+                            </div>
+                            
+                        </div>
                     </div>
                 </div>
             </div>
@@ -41,7 +58,14 @@
 </div>
 <style>
     .fallback{
-        max-height: 150px;
+        max-height: 194px;
         margin-left: 120px;
+    }
+
+    .thumbnail{
+        height: 50px;
+        width: 50px;
+        object-fit: cover;
+        border-radius: 20%
     }
 </style>

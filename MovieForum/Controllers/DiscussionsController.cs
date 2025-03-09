@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,19 +12,26 @@ using MovieForum.Models;
 
 namespace MovieForum.Controllers
 {
+    [Authorize]
     public class DiscussionsController : Controller
     {
         private readonly MovieForumContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DiscussionsController(MovieForumContext context)
+        public DiscussionsController(MovieForumContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Discussions
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Discussion.ToListAsync());
+            var discussions = await _context.Discussion
+                .Where(m => m.ApplicationUserId == _userManager.GetUserId(User))
+                .ToListAsync();
+
+            return View(discussions);
         }
 
         // GET: Discussions/Details/5
@@ -33,8 +42,8 @@ namespace MovieForum.Controllers
                 return NotFound();
             }
 
-            var discussion = await _context.Discussion
-                .FirstOrDefaultAsync(m => m.DiscussionId == id);
+            var discussion = await _context.Discussion.FirstOrDefaultAsync(m => m.DiscussionId == id);
+
             if (discussion == null)
             {
                 return NotFound();
@@ -57,8 +66,14 @@ namespace MovieForum.Controllers
         public async Task<IActionResult> Create([Bind("DiscussionId,Title,Content,ImageFile,CreateDate")] Discussion discussion)
         {
 
+            discussion.ApplicationUserId = _userManager.GetUserId(User);
+
             if (ModelState.IsValid)
             {
+                
+                _context.Add(discussion);
+                await _context.SaveChangesAsync();
+
                 if (discussion.ImageFile != null)
                 {
                     discussion.ImageFilename = Guid.NewGuid().ToString() + Path.GetExtension(discussion.ImageFile?.FileName);
@@ -68,12 +83,11 @@ namespace MovieForum.Controllers
                     {
                         await discussion.ImageFile.CopyToAsync(fileStream);
                     }
+
                 }
 
-                _context.Add(discussion);
-                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
 
-                return RedirectToAction("Index", "Home");
             }
 
             return View(discussion);
@@ -87,7 +101,10 @@ namespace MovieForum.Controllers
                 return NotFound();
             }
 
-            var discussion = await _context.Discussion.FindAsync(id);
+            var discussion = await _context.Discussion
+                .Where(m => m.ApplicationUserId == _userManager.GetUserId(User))
+                .Include("Comments")
+                .FirstOrDefaultAsync(m => m.DiscussionId == id);
             if (discussion == null)
             {
                 return NotFound();
@@ -139,6 +156,7 @@ namespace MovieForum.Controllers
             }
 
             var discussion = await _context.Discussion
+                .Where(m => m.ApplicationUserId == _userManager.GetUserId(User))
                 .FirstOrDefaultAsync(m => m.DiscussionId == id);
             if (discussion == null)
             {

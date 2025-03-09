@@ -33,12 +33,14 @@
                 <div class="navbar-collapse collapse d-lg-flex justify-content-between">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Discussions" asp-action="Create">Create Discussion</a>
+                            <a class="nav-link text-light" asp-area="" asp-controller="Discussions" asp-action="Create">Create Thread</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Discussions">Discussion List</a>
+                            <a class="nav-link text-light" asp-area="" asp-controller="Discussions" asp-action="Index">My Threads</a>
                         </li>
                     </ul>
+
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>

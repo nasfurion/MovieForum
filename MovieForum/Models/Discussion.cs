@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MovieForum.Data;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MovieForum.Models
@@ -19,5 +20,11 @@ namespace MovieForum.Models
 
         // Navigation Property
         public List<Comment>? Comments { get; set; }
+
+        // Foreign key (AspNetUsers table)
+        public string ApplicationUserId { get; set; } = string.Empty;
+
+        // Navigation property
+        public ApplicationUser? ApplicationUser { get; set; }
     }
 }

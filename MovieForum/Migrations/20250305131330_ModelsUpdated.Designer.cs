@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieForum.Data;
 
@@ -11,9 +12,11 @@ using MovieForum.Data;
 namespace MovieForum.Migrations
 {
     [DbContext(typeof(MovieForumContext))]
-    partial class MovieForumContextModelSnapshot : ModelSnapshot
+    [Migration("20250305131330_ModelsUpdated")]
+    partial class ModelsUpdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -264,7 +267,7 @@ namespace MovieForum.Migrations
 
                     b.HasIndex("DiscussionId");
 
-                    b.ToTable("Comment", (string)null);
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("MovieForum.Models.Discussion", b =>
@@ -297,7 +300,7 @@ namespace MovieForum.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Discussion", (string)null);
+                    b.ToTable("Discussion");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

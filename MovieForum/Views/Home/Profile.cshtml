@@ -1,0 +1,71 @@
+﻿@model MovieForum.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile Page";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">@Model.User.Name</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+
+            @if (!string.IsNullOrEmpty(Model.User.ImageFilename))
+            {
+                <div class="mb-3">
+                    <img src="~/profile_img/@Model.User.ImageFilename" alt="Profile Picture" class="img-fluid rounded hover-image" style="object-fit: contain; max-height: 550px; width: 100%;"  />
+                </div>
+            } else
+            {
+
+            }
+            <div class="d-flex flex-column align-items-center">
+                <p> <strong>From:</strong> @Model.User.Location </p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<h1 class="text-center mb-4">@Model.User.Name's Threads</h1>
+
+@foreach (var item in Model.Discussions)
+{
+    string imageUrl = Url.Content("/photos/" + item.ImageFilename);
+    int commentsNum = item.Comments?.Count() ?? 0;
+
+    <div class="card mb-3">
+        <div class="row no-gutters">
+            <div class="col-md-4" style="height: 150px">
+                @if (!string.IsNullOrEmpty(item.ImageFilename))
+                {
+                    <img class="img-fluid rounded-start" src="@imageUrl" alt="Discussion Image" style="object-fit: cover; height: 150px; width: 100%;" />
+                }
+                else
+                {
+                    <img class="img-fluid rounded-start fallback" src="~/6041412.png" alt="Fallback Image" />
+                }
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a asp-controller="Home" asp-action="GetDiscussion" asp-route-id="@item.DiscussionId" class="link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover">@item.Title</a>
+                    </h5>
+                    <p class="card-text">
+                        <strong>Created on:</strong> @item.CreateDate.ToString("MMMM dd, yyyy")
+                    </p>
+                    <p class="card-text">
+                        <strong>Comments:</strong> @commentsNum
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .fallback {
+        max-height: 150px;
+        margin-left: 120px;
+    }
+</style>
